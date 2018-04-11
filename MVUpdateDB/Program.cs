@@ -12,12 +12,13 @@ namespace MVUpdateDB
     {
         //LiteDB connection
         //static LiteDatabase db = new LiteDatabase(@"Users.db");
-
         static void Main(string[] args)
         {
-            var processor = new CommandLineProcessor(new ConsoleHost());
+            var processor = new CommandLineProcessor(new ConsoleHost(!args.Contains("/noninteractive")));
+            //var processor = new CommandLineProcessor(new ConsoleHost());
             processor.RegisterCommand<InsertCommand>("insert");
             processor.Process(args);
+            Console.ReadKey();
         }
     }
 
@@ -82,11 +83,22 @@ namespace MVUpdateDB
                 };
 
                 // Insert new customer document (Id will be auto-incremented)
-                col.Insert(user);
+                try
+                {
+                    col.Insert(user);
+                    host.WriteMessage("AvatarName: " + FirstValue);
+                    host.WriteMessage("\n");
+                    host.WriteMessage("AvatarPassword: " + hashsedPassword);
+                    host.WriteMessage("\n");
+                    host.WriteMessage("INFO: Record inserted.");
+                }
+                catch (LiteDB.LiteException e)
+                {
+                    host.WriteMessage("ERROR: " + e.Message);
+                    host.WriteMessage("\n");
+                }
+                
             }
-
-            host.WriteMessage("AvatarName: " + FirstValue);
-            host.WriteMessage("AvatarPassword: " + hashsedPassword);
             return null;
         }
     }
