@@ -8,6 +8,9 @@ using LiteDB;
 
 namespace MVUpdateDB
 {
+    /// <summary>
+    /// MainClass
+    /// </summary>
     class MainClass
     {
         //LiteDB connection
@@ -33,6 +36,9 @@ namespace MVUpdateDB
         public bool IsActive { get; set; }
     }
 
+    /// <summary>
+    /// Insert Command
+    /// </summary>
     [Description("Insert AvatarName and AvatarPassword")]
     public class InsertCommand : IConsoleCommand
     {
@@ -44,7 +50,9 @@ namespace MVUpdateDB
         [Argument(Name = "SecondValue")]
         public string SecondValue { get; set; }
 
+        #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
              //Connect and create users collection for LiteDB.org
             //LiteDB connection
@@ -59,7 +67,7 @@ namespace MVUpdateDB
  
             if (col.Count() == 0)
             {
-               // Create your new customer instance
+                // Create your new customer instance
                 var user = new Users
                 {
                     UserName = FirstValue,
@@ -72,7 +80,9 @@ namespace MVUpdateDB
 
                 // Insert new customer document (Id will be auto-incremented)
                 col.Insert(user);
-            } else {
+                ShowInfo(host, hashsedPassword);
+            }
+            else {
 
                 // Create your new customer instance
                 var user = new Users
@@ -86,11 +96,7 @@ namespace MVUpdateDB
                 try
                 {
                     col.Insert(user);
-                    host.WriteMessage("AvatarName: " + FirstValue);
-                    host.WriteMessage("\n");
-                    host.WriteMessage("AvatarPassword: " + hashsedPassword);
-                    host.WriteMessage("\n");
-                    host.WriteMessage("INFO: Record inserted.");
+                    ShowInfo(host, hashsedPassword);
                 }
                 catch (LiteDB.LiteException e)
                 {
@@ -100,6 +106,20 @@ namespace MVUpdateDB
                 
             }
             return null;
+        }
+
+        /// <summary>
+        /// ShowInfo about record inserted
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="hashsedPassword"></param>
+        private void ShowInfo(IConsoleHost host, string hashsedPassword)
+        {
+            host.WriteMessage("AvatarName: " + FirstValue);
+            host.WriteMessage("\n");
+            host.WriteMessage("AvatarPassword: " + hashsedPassword);
+            host.WriteMessage("\n");
+            host.WriteMessage("INFO: Record inserted.");
         }
     }
 }
