@@ -20,12 +20,13 @@ namespace MVUpdateDB
             var processor = new CommandLineProcessor(new ConsoleHost(!args.Contains("/noninteractive")));
             //var processor = new CommandLineProcessor(new ConsoleHost());
             processor.RegisterCommand<InsertCommand>("insert");
+            processor.RegisterCommand<ListCommand>("list");
             processor.Process(args);
-            Console.ReadKey();
+            //Console.ReadKey();
         }
     }
 
-    // <summary>
+    /// <summary>
     /// Users class.
     /// </summary>
     public class Users
@@ -37,7 +38,7 @@ namespace MVUpdateDB
     }
 
     /// <summary>
-    /// Insert Command
+    /// Insert command.
     /// </summary>
     [Description("Insert AvatarName and AvatarPassword")]
     public class InsertCommand : IConsoleCommand
@@ -54,17 +55,17 @@ namespace MVUpdateDB
         public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
         #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
-             //Connect and create users collection for LiteDB.org
+            //Connect and create users collection for LiteDB.org
             //LiteDB connection
             LiteDatabase db = new LiteDatabase(@"Users.db");
 
-             //Get users collection
+            //Get users collection
             var col = db.GetCollection<Users>("users");
 
             //Create Scrypt Password
             ScryptEncoder encoder = new ScryptEncoder();
             string hashsedPassword = encoder.Encode(SecondValue);
- 
+
             if (col.Count() == 0)
             {
                 // Create your new customer instance
@@ -82,7 +83,8 @@ namespace MVUpdateDB
                 col.Insert(user);
                 ShowInfo(host, hashsedPassword);
             }
-            else {
+            else
+            {
 
                 // Create your new customer instance
                 var user = new Users
@@ -103,7 +105,7 @@ namespace MVUpdateDB
                     host.WriteMessage("ERROR: " + e.Message);
                     host.WriteMessage("\n");
                 }
-                
+
             }
             return null;
         }
@@ -120,6 +122,53 @@ namespace MVUpdateDB
             host.WriteMessage("AvatarPassword: " + hashsedPassword);
             host.WriteMessage("\n");
             host.WriteMessage("INFO: Record inserted.");
+            host.WriteMessage("\n");
+        }
+    }
+
+    [Description("List all AvatarName in DB")]
+    public class ListCommand : IConsoleCommand
+    {
+        /*
+        [Description("The first value: AvatarName")]
+        [Argument(Name = "FirstValue")]
+        public string FirstValue { get; set; }
+        */
+
+        #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            //Connect and create users collection for LiteDB.org
+            //LiteDB connection
+            LiteDatabase db = new LiteDatabase(@"Users.db");
+
+            //Get users collection
+            var col = db.GetCollection<Users>("users");
+
+            //SEE:
+            //https://www.dotnetperls.com/datatable
+            //https://github.com/tarikguney/ascii-table-creator
+
+            //var results = col.Find(Query.And(Query.All("Age", Query.Descending), Query.Between("Age", 20, 30)), limit: 100);
+            var results = col.Find(Query.All("UserName", Query.Descending));
+            foreach (var c in results)
+            {
+                host.WriteMessage("ID: " + c.Id.ToString() + " - AvatarName: " + c.UserName);
+                host.WriteMessage("\n");
+            }
+            return null;
+        }
+    }
+
+    [Description("List all AvatarName in DB")]
+    public class List2Command : IConsoleCommand
+    {
+        #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        public async Task<object> RunAsync(CommandLineProcessor processor, IConsoleHost host)
+        #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        {
+            return null;
         }
     }
 }
