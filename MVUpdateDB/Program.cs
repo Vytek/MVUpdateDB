@@ -57,7 +57,7 @@ namespace MVUpdateDB
         {
             //Connect and create users collection for LiteDB.org
             //LiteDB connection
-            LiteDatabase db = new LiteDatabase(@"Users.db");
+            LiteDatabase db = new LiteDatabase(@"UsersObjects.db");
 
             //Get users collection
             var col = db.GetCollection<Users>("users");
@@ -141,7 +141,7 @@ namespace MVUpdateDB
         {
             //Connect and create users collection for LiteDB.org
             //LiteDB connection
-            LiteDatabase db = new LiteDatabase(@"Users.db");
+            LiteDatabase db = new LiteDatabase(@"UsersObjects.db");
 
             //Get users collection
             var col = db.GetCollection<Users>("users");
